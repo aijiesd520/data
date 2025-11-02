@@ -39,8 +39,8 @@ for ipaddr in "${IPS[@]}"; do
     user="$(gen_pwd)"
     pwd="$(gen_pwd)"
 
-    # 使用更兼容的 hash 生成方式（SHA512 crypt）
-    hash="$(openssl passwd -6 "$pwd")"
+ 
+    hash="$(openssl passwd -apr1 "$pwd")"
 
     echo "${user}:${hash}" >> "$PASSWD_FILE"
     echo "${ipaddr}:${PORT}:${user}:${pwd}" >> "$USER_LIST_FILE"
@@ -64,6 +64,36 @@ echo "[+] 明文用户列表（请妥善保管）： $USER_LIST_FILE"
 echo "下一步（必须）:"
 echo "1) 检查 $SQUID_CONF 中是否包含："
 echo "   include /etc/squid/outgoing_map.conf"
+# 生成 Squid 配置
+cat > "$SQUID_CONF" <<EOF
+max_filedescriptors 1048576
+workers 8
+# client_pconn_limit 16000  # disabled for Squid 3.5
+# client_netmask_v4  # disabled for Squid 3.5 0
+
+cache_mem 512 MB
+maximum_object_size_in_memory 64 MB
+maximum_object_size 512 MB
+cache_dir ufs /var/spool/squid 10000 16 256
+
+access_log none
+cache_log /var/log/squid/cache.log
+acl SSL_ports port 443
+acl Safe_ports port 80 21 443 70 210 1025-65535 280 488 591 777
+acl CONNECT method CONNECT
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+auth_param basic realm Proxy
+acl authenticated proxy_auth REQUIRED
+http_access allow authenticated
+http_access deny all
+visible_hostname PI10P65
+http_port 0.0.0.0:51128
+include /etc/squid/outgoing_map.conf
+EOF
+
+echo "[+] Squid 配置生成完毕，请重启 Squid:"
 echo "2) 重启 squid:"
 echo "   sudo systemctl restart squid"
 echo "3) 若 Squid 启动失败，请查看日志： /var/log/squid/cache.log"

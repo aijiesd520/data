@@ -54,6 +54,8 @@ for ipaddr in "${IPS[@]}"; do
 done
 
 chmod 600 "$PASSWD_FILE" "$USER_LIST_FILE" "$OUTGOING_CONF"
+chown proxy:proxy /etc/squid/passwd
+chmod 640 /etc/squid/passwd
 
 echo "[+] 完成：生成 ${#IPS[@]} 个用户与对应 ACL/tcp_outgoing_address 规则。"
 echo "[+] passwd 文件： $PASSWD_FILE"
@@ -78,17 +80,21 @@ cache_dir ufs /var/spool/squid 10000 16 256
 
 access_log none
 cache_log /var/log/squid/cache.log
-acl SSL_ports port 443
-acl Safe_ports port 80 21 443 70 210 1025-65535 280 488 591 777
-acl CONNECT method CONNECT
-http_access deny !Safe_ports
-http_access deny CONNECT !SSL_ports
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
 auth_param basic realm Proxy
 acl authenticated proxy_auth REQUIRED
+
+acl SSL_ports port 443
+acl Safe_ports port 80 21 443 70 210 1025-65535 280 488 591 777
+acl CONNECT method CONNECT
+
+# 先允许认证，再限制端口
 http_access allow authenticated
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
 http_access deny all
-visible_hostname PI10P65
+
+visible_hostname PI10P66
 http_port 0.0.0.0:51128
 include /etc/squid/outgoing_map.conf
 EOF

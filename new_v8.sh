@@ -32,8 +32,7 @@ echo "[+] 检测到公网 IP 共 ${#IPS[@]} 个"
 
 # 随机密码函数（生成 16 字符的 URL-safe 密码）
 gen_pwd() {
-    tr -dc 'A-Za-z0-9!@#%_+=-' < /dev/urandom | head -c 8 || \
-    openssl rand -base64 12 | tr -dc 'A-Za-z0-9!@#%_+=-' | head -c 8
+    tr -dc 'A-Za-z0-9!@#%_+=-' < /dev/urandom | head -c 8
 }
 
 

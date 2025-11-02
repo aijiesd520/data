@@ -1,4 +1,4 @@
-
+#!/bin/bash
 set -eEuo pipefail
 trap 'echo "❌ 出错：第 ${LINENO} 行：命令 [${BASH_COMMAND}]"; exit 1' ERR
 
@@ -31,7 +31,7 @@ echo "[+] 检测到公网 IP 共 ${#IPS[@]} 个"
 
 # 随机密码函数
 gen_pwd() {
-    tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 8
+    tr -dc 'A-Za-z0-9!@#%_=+\-' < /dev/urandom | head -c 8 || true
 }
 
 # 生成用户、密码与配置
@@ -60,7 +60,7 @@ echo "[+] passwd 文件： $PASSWD_FILE"
 echo "[+] outgoing 配置： $OUTGOING_CONF"
 echo "[+] 明文用户列表（请妥善保管）： $USER_LIST_FILE"
 
-echo
+
 echo "下一步（必须）:"
 echo "1) 检查 $SQUID_CONF 中是否包含："
 echo "   include /etc/squid/outgoing_map.conf"

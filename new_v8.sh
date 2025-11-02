@@ -32,9 +32,10 @@ echo "[+] 检测到公网 IP 共 ${#IPS[@]} 个"
 
 # 随机密码函数（生成 16 字符的 URL-safe 密码）
 gen_pwd() {
-    # 使用 /dev/urandom -> base64 -> 删除 +/ -> 取前16
-    tr -dc 'A-Za-z0-9!@#%_-+=' < /dev/urandom | head -c 16 || openssl rand -base64 12
+    tr -dc 'A-Za-z0-9!@#%_+=-' < /dev/urandom | head -c 8 || \
+    openssl rand -base64 12 | tr -dc 'A-Za-z0-9!@#%_+=-' | head -c 8
 }
+
 
 # 生成用户、passwd 和 outgoing_map.conf
 

@@ -1,7 +1,6 @@
-#!/bin/bash
+
 set -eEuo pipefail
 trap 'echo "❌ 出错：第 ${LINENO} 行：命令 [${BASH_COMMAND}]"; exit 1' ERR
-
 
 # 配置（按需修改）
 SQUID_CONF="/etc/squid/squid.conf"
@@ -32,7 +31,7 @@ echo "[+] 检测到公网 IP 共 ${#IPS[@]} 个"
 
 # 随机密码函数
 gen_pwd() {
-    tr -dc 'A-Za-z0-9!@#%_+=-' < /dev/urandom | head -c 8
+    tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 8
 }
 
 # 生成用户、密码与配置

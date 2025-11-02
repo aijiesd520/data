@@ -31,7 +31,7 @@ echo "[+] 检测到公网 IP 共 ${#IPS[@]} 个"
 
 # 随机密码函数
 gen_pwd() {
-    tr -dc 'A-Za-z0-9!@#%_=+\-' < /dev/urandom | head -c 8 || true
+    tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 8 || true
 }
 
 # 生成用户、密码与配置

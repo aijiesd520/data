@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -eEuo pipefail
+trap 'echo "❌ 出错：第 ${LINENO} 行：命令 [${BASH_COMMAND}]"; exit 1' ERR
+
 
 # 配置（按需修改）
 SQUID_CONF="/etc/squid/squid.conf"

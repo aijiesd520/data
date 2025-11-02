@@ -36,7 +36,7 @@ gen_pwd() {
 
 # 生成用户、密码与配置
 for ipaddr in "${IPS[@]}"; do
-    user="DD$(gen_pwd)"
+    user="$(gen_pwd)"
     pwd="$(gen_pwd)"
 
     # 使用更兼容的 hash 生成方式（SHA512 crypt）

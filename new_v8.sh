@@ -77,7 +77,8 @@ maximum_object_size_in_memory 64 MB
 maximum_object_size 512 MB
 cache_dir ufs /var/spool/squid 10000 16 256
 
-access_log none
+#access_log none
+access_log stdio:/var/log/squid/access.log
 cache_log /var/log/squid/cache.log
 acl SSL_ports port 443
 acl Safe_ports port 80 21 443 70 210 51128 280 488 591 777

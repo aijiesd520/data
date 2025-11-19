@@ -1,10 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-# 你的网卡
 IFACE="enp3s0"
+CFG="/etc/network/interfaces.d/${IFACE}-ips.cfg"
 
-# 所有网段
 RANGES=(
 194.143.222.0/24
 194.60.90.0/24
@@ -34,39 +33,29 @@ RANGES=(
 64.188.19.0/24
 )
 
-echo "开始永久写入 IP 到 NetworkManager 配置..."
+echo "生成永久 IP 配置: $CFG"
+echo "# 自动生成的附加IP" > "$CFG"
+echo "iface $IFACE inet static" >> "$CFG"
+echo "    address 0.0.0.0" >> "$CFG"
+echo "    netmask 255.255.255.255" >> "$CFG"
+
+IDX=0
 
 for range in "${RANGES[@]}"; do
   ip_base=$(echo "$range" | cut -d/ -f1)
   mask=$(echo "$range" | cut -d/ -f2)
-
   IFS=. read -r a b c d <<< "$ip_base"
 
-  echo "处理网段: $range"
-
-  # /24 段
   if [ "$mask" = "24" ]; then
     for i in $(seq 1 254); do
       ip="${a}.${b}.${c}.${i}"
-      nmcli con mod "$IFACE" +ipv4.addresses "${ip}/32"
+      echo "    up ip addr add ${ip}/32 dev $IFACE" >> "$CFG"
+      IDX=$((IDX+1))
     done
   fi
 
-  # /22 段
-  if [ "$mask" = "22" ]; then
-    for c2 in $(seq $c $((c+3))); do
-      for i in $(seq 1 254); do
-        ip="${a}.${b}.${c2}.${i}"
-        nmcli con mod "$IFACE" +ipv4.addresses "${ip}/32"
-      done
-    done
-  fi
 done
 
-echo "重新加载网卡..."
-nmcli con down "$IFACE" || true
-nmcli con up "$IFACE"
-
+echo "生成完毕：共 $IDX 个 IP 已写入 $CFG"
 echo ""
-echo "绑定完成（永久有效）。"
-echo "当前绑定数量：$(ip -4 addr show dev $IFACE | grep -c 'inet ')"
+echo "重启网络以应用： systemctl restart networking"

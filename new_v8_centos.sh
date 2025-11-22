@@ -85,7 +85,9 @@ acl Safe_ports port 80 21 443 70 210 51128 280 488 591 777
 acl CONNECT method CONNECT
 http_access deny !Safe_ports
 http_access deny CONNECT !SSL_ports
-auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+
+auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd
+
 auth_param basic realm Proxy
 acl authenticated proxy_auth REQUIRED
 http_access allow authenticated

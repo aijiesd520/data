@@ -54,7 +54,7 @@ for ipaddr in "${IPS[@]}"; do
 done
 
 chmod 600 "$PASSWD_FILE" "$USER_LIST_FILE" "$OUTGOING_CONF"
-chown proxy:proxy /etc/squid/passwd
+chown squid:squid /etc/squid/passwd
 chmod 640 /etc/squid/passwd
 
 echo "[+] 完成：生成 ${#IPS[@]} 个用户与对应 ACL/tcp_outgoing_address 规则。"

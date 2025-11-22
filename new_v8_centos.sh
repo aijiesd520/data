@@ -101,3 +101,7 @@ echo "[+] Squid 配置生成完毕，请重启 Squid:"
 echo "2) 重启 squid:"
 echo "   sudo systemctl restart squid"
 echo "3) 若 Squid 启动失败，请查看日志： /var/log/squid/cache.log"
+
+chown -R squid:squid /var/spool/squid
+chmod -R 755 /var/spool/squid
+
